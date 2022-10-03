@@ -1,17 +1,16 @@
 import express from "express";
-import pg from 'pg';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import categoryRouter from './routes/categories.js';
 
-const { Pool } = pg;
-const connection = new Pool({
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: 'Doradoidona2332',
-    database: 'boardcamp'
-});
+dotenv.config();
 
 const server = express();
 
+server.use(cors());
+server.use(express.json());
+server.use(categoryRouter);
 
-
-server.listen(4000);
+server.listen(process.env.PORT, () => {
+    console.log(`The listening port is ${process.env.PORT}`);
+});
