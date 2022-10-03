@@ -28,4 +28,4 @@ async function addCategory(req, res) {
     }
 }
 
-export { allCategories, addCategory }
+export { allCategories, addCategory };
