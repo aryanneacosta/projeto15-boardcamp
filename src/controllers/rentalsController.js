@@ -32,14 +32,17 @@ async function addRental(req, res) {
         if(gameExists.rowCount === 0) {
             return res.sendStatus(400);
         }
-        const howManyRentals = await connection.query('SELECT "gameId" FROM rentals WHERE "gameId" = $1', [gameId]).rows;
-        if(gameExists.rows.length <= howManyRentals.length) {
-            return res.sendStatus(400);
+        const game = await connection.query('SELECT * FROM games WHERE id = $1', [gameId]);
+        const gameData = game.rows;
+        if(gameExists.rowCount > 0) {
+            if (gameData.stockTotal === gameExists.rowCount){
+                return res.sendStatus(400);
+            }
         }
 
         const originalPrice = gameExists.rows[0].pricePerDay * daysRented;
 
-        await connection.query('INSERT INTO rentals ("customerId", "gameId", "rentDdate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES ($1, $2, NOW(), $3, NULL, $4, NULL)', [customerId, gameId, daysRented, originalPrice])
+        await connection.query('INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES ($1, $2, NOW(), $3, NULL, $4, NULL)', [customerId, gameId, daysRented, originalPrice])
         res.sendStatus(201);
     } catch (error) {
         res.sendStatus(500);
@@ -69,6 +72,7 @@ async function finishedRental(req, res) {
         res.sendStatus(200);
     } catch (error) {
         res.sendStatus(500);
+        console.log(error.message)
     }
 }
 
