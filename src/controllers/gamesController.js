@@ -1,8 +1,14 @@
 import connection from "../databases/database.js";
 
 async function allGames(req, res) {
+    const { name } = req.query;
 
     try {
+        if(name) {
+            const games = await connection.query('SELECT games.*, categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.name ILIKE "$1%"', [name]);
+            return res.send(games.rows);
+        }
+
         const games = await connection.query('SELECT games.*, categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id');
         res.send(games.rows);
     } catch (error) {
